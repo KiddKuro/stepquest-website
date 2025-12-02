@@ -112,15 +112,13 @@ export default function Home() {
         setLevel(data.level ?? 1);
       } else {
         // first time – create default row
-        const { error: insertError } = await supabase
-          .from("player_stats")
-          .insert({
-            user_id: user.id,
-            steps_today: 0,
-            total_steps: 0,
-            xp: 0,
-            level: 1,
-          });
+        const { error: insertError } = await supabase.from("player_stats").insert({
+          user_id: user.id,
+          steps_today: 0,
+          total_steps: 0,
+          xp: 0,
+          level: 1,
+        });
 
         if (insertError) {
           console.error("Error creating stats row:", insertError);
@@ -139,12 +137,10 @@ export default function Home() {
   const saveStats = async (stats) => {
     if (!user) return;
 
-    const { error } = await supabase
-      .from("player_stats")
-      .upsert({
-        user_id: user.id,
-        ...stats,
-      });
+    const { error } = await supabase.from("player_stats").upsert({
+      user_id: user.id,
+      ...stats,
+    });
 
     if (error) {
       console.error("Error saving stats:", error);
@@ -295,100 +291,168 @@ export default function Home() {
   const pixelRows = heroSprite.pixels;
   const cols = pixelRows[0].length;
 
-  return (
-    <div className="page">
-      <h1 className="page-title">StepQuest Dashboard</h1>
+  // NEW: mobile‑app style metrics
+  const dailyGoal = 5000; // change if you like
+  const dayPercent = Math.min(100, Math.round((stepsToday / dailyGoal) * 100));
+  const distanceKm = (stepsToday * 0.0008).toFixed(1); // rough km estimate
+  const calories = Math.round(stepsToday * 0.05); // rough kcal
+  const activeMinutes = Math.round(stepsToday / 100); // ~1 min per 100 steps
 
-      {/* PIXEL KNIGHT (code‑drawn) */}
-      <div className="knight-container">
-        <div
-          ref={knightRef}
-          className="hero-pixel-grid"
-          style={{
-            gridTemplateColumns: `repeat(${cols}, 1fr)`,
-            boxShadow: `0 0 0 4px ${heroSprite.colors["1"]}33, 0 0 16px ${heroSprite.colors["3"]}66`,
-          }}
-        >
-          {pixelRows.map((row, rowIndex) =>
-            row.split("").map((cell, colIndex) => {
-              const key = `${rowIndex}-${colIndex}`;
-              if (cell === ".") {
+  return (
+    <div className="page home-page">
+      <div className="home-shell">
+        {/* HEADER */}
+        <header className="home-header">
+          <div>
+            <p className="home-header-label">Today</p>
+            <p className="home-header-date">
+              {new Date().toLocaleDateString(undefined, {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })}
+            </p>
+          </div>
+        </header>
+
+        {/* BIG CIRCLE CARD */}
+        <section className="steps-card">
+          <div
+            className="steps-ring-circle"
+            style={{
+              backgroundImage: `conic-gradient(#22c55e ${dayPercent}%, #111827 ${dayPercent}% 100%)`,
+            }}
+          >
+            <div className="steps-ring-inner">
+              <p className="steps-today-number">
+                {stepsToday.toLocaleString()}
+              </p>
+              <p className="steps-goal-text">
+                of {dailyGoal.toLocaleString()} steps
+              </p>
+            </div>
+          </div>
+
+          <div className="steps-badge">
+            <span className="badge-icon">⚔️</span>
+            <span className="badge-text">StepQuest · LVL {level}</span>
+          </div>
+        </section>
+
+        {/* METRIC ROW */}
+        <section className="metrics-row">
+          <div className="metric-card">
+            <p className="metric-label">Distance</p>
+            <p className="metric-value">{distanceKm} km</p>
+          </div>
+          <div className="metric-card">
+            <p className="metric-label">Calories</p>
+            <p className="metric-value">{calories}</p>
+          </div>
+          <div className="metric-card">
+            <p className="metric-label">Active</p>
+            <p className="metric-value">{activeMinutes} min</p>
+          </div>
+        </section>
+
+        {/* PIXEL KNIGHT SECTION */}
+        <section className="knight-section">
+          <div
+            ref={knightRef}
+            className="hero-pixel-grid"
+            style={{
+              gridTemplateColumns: `repeat(${cols}, 1fr)`,
+              boxShadow: `0 0 0 4px ${heroSprite.colors["1"]}33, 0 0 16px ${heroSprite.colors["3"]}66`,
+            }}
+          >
+            {pixelRows.map((row, rowIndex) =>
+              row.split("").map((cell, colIndex) => {
+                const key = `${rowIndex}-${colIndex}`;
+                if (cell === ".") {
+                  return (
+                    <div
+                      key={key}
+                      className="hero-pixel-cell pixel-empty"
+                    />
+                  );
+                }
+                const color = heroSprite.colors[cell] || "transparent";
                 return (
                   <div
                     key={key}
-                    className="hero-pixel-cell pixel-empty"
+                    className="hero-pixel-cell"
+                    style={{ backgroundColor: color }}
                   />
                 );
-              }
-              const color = heroSprite.colors[cell] || "transparent";
-              return (
-                <div
-                  key={key}
-                  className="hero-pixel-cell"
-                  style={{ backgroundColor: color }}
-                />
-              );
-            })
+              })
+            )}
+          </div>
+
+          <div className="knight-info">
+            <p className="knight-level">LVL {level}</p>
+            <p className="knight-title">{heroSprite.title}</p>
+          </div>
+
+          {/* Inventory floating button */}
+          <button
+            className="inventory-fab"
+            onClick={() => navigate("/inventory")}
+          >
+            🎒
+          </button>
+        </section>
+
+        {/* BOTTOM DETAILS CARD */}
+        <section className="details-card">
+          <p className="stat">
+            Steps Today:{" "}
+            <span className="stat-highlight">
+              {stepsToday.toLocaleString()}
+            </span>
+          </p>
+          <p className="stat">
+            Total Steps:{" "}
+            <span className="stat-highlight">
+              {totalSteps.toLocaleString()}
+            </span>
+          </p>
+          <p className="stat">
+            Level: <span className="stat-highlight">{level}</span>
+          </p>
+          <p className="stat">
+            XP: {xp} / {xpToNext}
+          </p>
+
+          <div className="xp-bar">
+            <div className="xp-fill" style={{ width: `${xpPercent}%` }} />
+          </div>
+
+          <hr />
+
+          {!activeQuest && (
+            <p className="stat muted">No quest selected.</p>
           )}
-        </div>
 
-        <div className="knight-info">
-          <p className="knight-level">LVL {level}</p>
-          <p className="knight-title">{heroSprite.title}</p>
-        </div>
-      </div>
+          {activeQuest && (
+            <>
+              <h2 className="card-title">{activeQuest.title}</h2>
+              <p className="stat">
+                Progress: {questProgress} / {questGoal}
+              </p>
+              <div className="quest-bar">
+                <div
+                  className="quest-fill"
+                  style={{ width: `${questPercent}%` }}
+                />
+              </div>
+              {questCompleted && <p>✅ Quest Completed!</p>}
+            </>
+          )}
 
-      {/* Inventory */}
-      <button
-        className="inventory-btn"
-        onClick={() => navigate("/inventory")}
-      >
-        🎒
-      </button>
-
-      {/* Stats */}
-      <div className="card">
-        <p className="stat">
-          Steps Today: <span className="stat-highlight">{stepsToday}</span>
-        </p>
-        <p className="stat">
-          Total Steps: <span className="stat-highlight">{totalSteps}</span>
-        </p>
-        <p className="stat">
-          Level: <span className="stat-highlight">{level}</span>
-        </p>
-        <p className="stat">
-          XP: {xp} / {xpToNext}
-        </p>
-
-        <div className="xp-bar">
-          <div className="xp-fill" style={{ width: `${xpPercent}%` }} />
-        </div>
-
-        <hr />
-
-        {!activeQuest && <p>No quest selected.</p>}
-
-        {activeQuest && (
-          <>
-            <h2 className="card-title">{activeQuest.title}</h2>
-            <p className="stat">
-              Progress: {questProgress} / {questGoal}
-            </p>
-            <div className="quest-bar">
-              <div
-                className="quest-fill"
-                style={{ width: `${questPercent}%` }}
-              />
-            </div>
-            {questCompleted && <p>✅ Quest Completed!</p>}
-          </>
-        )}
-
-        {/* test button so you can see colours change without real steps */}
-        <button className="btn-primary" onClick={simulateSteps}>
-          Simulate +500 Steps
-        </button>
+          <button className="btn-primary full-width" onClick={simulateSteps}>
+            Simulate +500 Steps
+          </button>
+        </section>
       </div>
     </div>
   );

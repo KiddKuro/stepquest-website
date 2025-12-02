@@ -2,10 +2,267 @@
   color-scheme: dark;
 }
 
+/* Make the whole app full‑height and same background */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
-  margin: 0;
+  background-color: #020617; /* deep dark everywhere */
+  color: #f9fafb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+/* === MOBILE‑APP STYLE HOME LAYOUT === */
+
+.page.home-page {
+  min-height: 100vh;
+  background: #020617; /* same as body so no grey frame */
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0;
+  color: #f9fafb;
+}
+
+.home-shell {
+  width: 100%;
+  max-width: 420px;            /* feels like a phone screen */
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Header (Today, date) */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-header-label {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+.home-header-date {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Big circle card */
+.steps-card {
+  background: #020617;
+  border-radius: 24px;
+  padding: 1.5rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.steps-ring-circle {
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #111827;
+}
+
+.steps-ring-circle::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: 999px;
+  background: #020617;
+}
+
+.steps-ring-inner {
+  position: relative;
+  text-align: center;
+}
+
+.steps-today-number {
+  font-size: 2.8rem;
+  font-weight: 700;
+}
+
+.steps-goal-text {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+/* badge under circle */
+.steps-badge {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #020617;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #111827;
+}
+
+.badge-icon {
+  font-size: 1rem;
+}
+
+.badge-text {
+  font-size: 0.8rem;
+  color: #e5e7eb;
+}
+
+/* row of small metric cards */
+.metrics-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.metric-card {
+  flex: 1;
+  background: #020617;
+  border-radius: 16px;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #111827;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-bottom: 0.25rem;
+}
+
+.metric-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* knight area */
+.knight-section {
+  margin-top: 0.5rem;
+  background: #020617;
+  border-radius: 20px;
+  padding: 1rem 1.1rem;
+  border: 1px solid #111827;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.hero-pixel-grid {
+  display: grid;
+  width: 96px;
+  height: 96px;
+  background: #020617;
+  border-radius: 20px;
+  padding: 6px;
+}
+
+.hero-pixel-cell {
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.pixel-empty {
+  background: transparent;
+}
+
+.knight-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.knight-level {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.knight-title {
+  font-size: 0.95rem;
+}
+
+/* Inventory floating button like an app FAB */
+.inventory-fab {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #facc15;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* bottom card */
+.details-card {
+  margin-top: 0.25rem;
+  background: #020617;
+  border-radius: 20px;
+  padding: 1.1rem 1.1rem 1.4rem;
+  border: 1px solid #111827;
+}
+
+.details-card .stat {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.details-card .stat-highlight {
+  color: #facc15;
+}
+
+.details-card .muted {
+  color: #6b7280;
+}
+
+/* xp + quest bars */
+.xp-bar,
+.quest-bar {
+  margin-top: 0.4rem;
+  height: 7px;
+  border-radius: 999px;
+  background: #020617;
+  overflow: hidden;
+}
+
+.xp-fill,
+.quest-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #22c55e;
+}
+
+/* full width primary button */
+.btn-primary.full-width {
+  margin-top: 1rem;
+  width: 100%;
+  justify-content: center;
+}
+
+/* tweak navbar if any top usage remains */
+.pixel-navbar {
+  background: #020617;
+  border-bottom: 1px solid #111827;
 }

@@ -1,64 +1,97 @@
+// src/pages/Signup.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
-  const { signup } = useAuth();
+  const { signup } = useAuth(); // ⬅ if your function is called register/signUp, use that name
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setInfo("");
+    setLoading(true);
 
     try {
-      await signup(email, password);
-      navigate("/"); // go to dashboard
+      await signup(email.trim(), password);
+      // Supabase usually sends a confirmation email
+      setInfo("Check your email to confirm your account, then log in.");
+      // Optionally send them to login:
+      // navigate("/login");
     } catch (err) {
       console.error(err);
-      setError(err.message);
-      
+      setError(err.message || "Could not sign up. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="page auth-page">
-      <div className="card auth-card">
-        <h1 className="page-title">Create Account</h1>
-        {error && <p className="auth-error">{error}</p>}
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-switch">
+          <Link to="/login" className="auth-switch-btn">
+            Log In
+          </Link>
+          <button className="auth-switch-btn auth-switch-btn--active">
+            Sign Up
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <label>
+        <h1 className="auth-title">Create your account ✨</h1>
+        <p className="auth-subtitle">
+          Start tracking your steps, quests and loot across devices.
+        </p>
+
+        {error && <div className="auth-error">{error}</div>}
+        {info && <div className="auth-info">{info}</div>}
+
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <label className="auth-label">
             Email
             <input
+              className="auth-input"
               type="email"
-              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
             />
           </label>
 
-          <label>
+          <label className="auth-label">
             Password
             <input
+              className="auth-input"
               type="password"
-              required
-              minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
             />
           </label>
 
-          <button className="btn-primary" type="submit">
-            Sign Up
+          <button
+            className="auth-primary-btn"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Creating account..." : "Sign up with Email"}
           </button>
         </form>
 
-        <p className="auth-switch">
-          Already have an account? <Link to="/login">Log in</Link>
+        <p className="auth-footer-text">
+          Already have an account?{" "}
+          <Link to="/login" className="auth-link">
+            Log in
+          </Link>
         </p>
       </div>
     </div>
