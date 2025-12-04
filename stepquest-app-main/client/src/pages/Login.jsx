@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
-  const { login } = useAuth(); // ⬅ if your function is called signIn, change this
+  const { login } = useAuth(); 
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -31,7 +31,7 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        {/* segmented switch like in your example */}
+        {/* segmented switch  */}
         <div className="auth-switch">
           <button className="auth-switch-btn auth-switch-btn--active">
             Log In

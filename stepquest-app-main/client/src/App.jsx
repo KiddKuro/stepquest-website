@@ -9,6 +9,9 @@ import InventoryPage from "./pages/InventoryPage";
 import AIQuestMaster from "./pages/AIQuestMaster";
 import Insights from "./pages/Insights";
 import ProfilePage from "./pages/ProfilePage";
+import Leaderboard from "./pages/Leaderboard";
+import Friends from "./pages/Friends";
+import Settings from "./pages/Settings";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -31,7 +34,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
-          {/* PROTECTED ROUTES (need to be logged in) */}
+          {/* PROTECTED ROUTES */}
           <Route
             path="/"
             element={
@@ -40,7 +43,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/quests"
             element={
@@ -49,7 +51,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/map"
             element={
@@ -58,7 +59,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/inventory"
             element={
@@ -67,7 +67,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/ai"
             element={
@@ -76,7 +75,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/insights"
             element={
@@ -85,13 +83,35 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* 👇 NEW: PROFILE ROUTE (also protected) */}
           <Route
             path="/profile"
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <Leaderboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/friends"
+            element={
+              <ProtectedRoute>
+                <Friends />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             }
           />

@@ -4,8 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
-  const { signup } = useAuth(); // ⬅ if your function is called register/signUp, use that name
-  const navigate = useNavigate();
+  const { signup } = useAuth(); 
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +21,7 @@ export default function Signup() {
     try {
       await signup(email.trim(), password);
       // Supabase usually sends a confirmation email
-      setInfo("Check your email to confirm your account, then log in.");
+      setInfo("Account created please Log in");
       // Optionally send them to login:
       // navigate("/login");
     } catch (err) {

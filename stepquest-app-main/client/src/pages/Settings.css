@@ -1,0 +1,143 @@
+.settings-page {
+  padding: 2rem 1.5rem 5rem;
+  max-width: 720px;
+  margin: 0 auto;
+  color: #f9fafb;
+}
+
+.settings-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.settings-card {
+  background: #020617;
+  border-radius: 18px;
+  padding: 1.3rem 1.4rem;
+  border: 1px solid #111827;
+  margin-bottom: 1rem;
+}
+
+.settings-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* --- Profile row inside Settings --- */
+
+.settings-row-button {
+  width: 100%;
+  border: none;
+  background: #020617;
+  border-radius: 14px;
+  padding: 0.7rem 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.settings-row-button:hover {
+  background: #030712;
+  transform: translateY(-1px);
+}
+
+.settings-profile-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.settings-avatar-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.settings-avatar-fallback {
+  font-size: 1.4rem;
+}
+
+.settings-profile-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.settings-profile-sub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.settings-chevron {
+  font-size: 1.4rem;
+  color: #6b7280;
+}
+
+/* Account */
+
+.settings-email {
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+}
+
+.settings-email span {
+  color: #e5e7eb;
+}
+
+.settings-primary-btn {
+  background: #3b82f6;
+  border: none;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-primary-btn:hover {
+  background: #2563eb;
+}
+
+/* Toggles */
+
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+/* Danger zone */
+
+.danger-card {
+  border-color: #7f1d1d;
+}
+
+.settings-danger-btn {
+  background: #b91c1c;
+  border: none;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-danger-btn:hover {
+  background: #dc2626;
+}

@@ -1,9 +1,10 @@
+// src/pages/Insights.jsx
 import { useMemo } from "react";
 import { useQuest } from "../context/QuestContext";
 
 const MONTH_LABELS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
 
-// Helper to generate a “nice looking” distribution over 12 bars
+// Helper to generate a distribution over 12 bars
 const BASE_WEIGHTS = [0.9, 1.1, 1.0, 1.3, 1.6, 1.2, 0.8, 0.9, 1.0, 1.4, 1.3, 1.1];
 
 export default function Insights() {
@@ -16,6 +17,7 @@ export default function Insights() {
     bestMonthIndex,
     bestMonthSteps,
     avgSteps,
+    linePoints,
   } = useMemo(() => {
     const yearlyTotal = totalSteps;
 
@@ -26,6 +28,7 @@ export default function Insights() {
         bestMonthIndex: 0,
         bestMonthSteps: 0,
         avgSteps: 0,
+        linePoints: "",
       };
     }
 
@@ -34,12 +37,21 @@ export default function Insights() {
       (w) => (yearlyTotal * w) / weightSum
     );
 
-    // Round nicely
     const monthlySteps = monthlyStepsRaw.map((v) => Math.round(v));
 
     const bestMonthSteps = Math.max(...monthlySteps);
     const bestMonthIndex = monthlySteps.indexOf(bestMonthSteps);
     const avgSteps = Math.round(yearlyTotal / 12);
+
+    const maxForChart = bestMonthSteps || 1;
+    const linePoints = monthlySteps
+      .map((value, idx) => {
+        const x =
+          (idx / (monthlySteps.length - 1 || 1)) * 100; // 0–100 across
+        const y = 100 - (value / maxForChart) * 100; // invert for SVG
+        return `${x},${y}`;
+      })
+      .join(" ");
 
     return {
       yearlyTotal,
@@ -47,6 +59,7 @@ export default function Insights() {
       bestMonthIndex,
       bestMonthSteps,
       avgSteps,
+      linePoints,
     };
   }, [totalSteps]);
 
@@ -56,20 +69,19 @@ export default function Insights() {
     <div className="page">
       <h1 className="page-title">Insights</h1>
 
-      <div className="card insights-shell">
+      <div className="insights-shell">
         {/* Header row: "Best Year" + Steps pill */}
         <div className="insights-header">
           <div>
             <p className="insights-label">Best Year</p>
             <p className="insights-year">{yearLabel}</p>
             <p className="insights-total">
-              {yearlyTotal.toLocaleString()} <span className="insights-total-unit">steps</span>
+              {yearlyTotal.toLocaleString()}{" "}
+              <span className="insights-total-unit">steps</span>
             </p>
           </div>
 
-          <button className="insights-mode-pill">
-            Steps ▾
-          </button>
+          <button className="insights-mode-pill">Steps ▾</button>
         </div>
 
         {/* Tabs row */}
@@ -82,43 +94,59 @@ export default function Insights() {
 
         {/* Chart */}
         <div className="insights-chart-wrapper">
-          {/* Target & average lines */}
-          <div className="insights-line-label insights-line-label-top">
-            <span>{bestMonthSteps.toLocaleString()}</span>
-          </div>
-          <div className="insights-line-label insights-line-label-mid">
-            <span>AVG {avgSteps.toLocaleString()}</span>
-          </div>
-
+          {/* Target & average labels */}
           <div className="insights-chart-bg">
             <div className="insights-line insights-line-top" />
             <div className="insights-line insights-line-mid" />
+
+            <span className="insights-line-label insights-line-label-top">
+              {bestMonthSteps.toLocaleString()}
+            </span>
+            <span className="insights-line-label insights-line-label-mid">
+              AVG {avgSteps.toLocaleString()}
+            </span>
           </div>
 
-          <div className="insights-bars">
-            {monthlySteps.map((value, idx) => {
-              const isBest = idx === bestMonthIndex;
-              const heightPct =
-                bestMonthSteps > 0
-                  ? Math.max(8, Math.round((value / bestMonthSteps) * 100))
-                  : 0;
+          {/* SVG line graph */}
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="insights-line-chart"
+          >
+            {yearlyTotal > 0 && (
+              <>
+                <polyline
+                  points={linePoints}
+                  className="insights-line-path"
+                />
+                {monthlySteps.map((value, idx) => {
+                  const maxForChart = bestMonthSteps || 1;
+                  const x =
+                    (idx / (monthlySteps.length - 1 || 1)) * 100;
+                  const y = 100 - (value / maxForChart) * 100;
 
-              return (
-                <div key={idx} className="insights-bar-group">
-                  <div
-                    className={
-                      "insights-bar" +
-                      (isBest ? " insights-bar-best" : "")
-                    }
-                    style={{ height: `${heightPct}%` }}
-                    title={`${MONTH_LABELS[idx]}: ${value.toLocaleString()} steps`}
-                  />
-                  <span className="insights-bar-label">
-                    {MONTH_LABELS[idx]}
-                  </span>
-                </div>
-              );
-            })}
+                  return (
+                    <circle
+                      key={idx}
+                      cx={x}
+                      cy={y}
+                      r={1.8}
+                      className={
+                        "insights-dot" +
+                        (idx === bestMonthIndex ? " insights-dot-best" : "")
+                      }
+                    />
+                  );
+                })}
+              </>
+            )}
+          </svg>
+
+          {/* Month labels under chart */}
+          <div className="insights-month-row">
+            {MONTH_LABELS.map((m) => (
+              <span key={m}>{m}</span>
+            ))}
           </div>
         </div>
 

@@ -55,7 +55,7 @@ export function AuthProvider({ children }) {
 
   const value = { user, signup, login, logout };
 
-  if (loading) return null; // you can swap this for a loading spinner later
+  if (loading) return null; 
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

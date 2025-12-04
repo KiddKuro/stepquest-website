@@ -99,49 +99,59 @@ export default function Home() {
         LOAD STATS FROM SUPABASE
   ------------------------------*/
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    const loadStats = async () => {
-      const { data, error } = await supabase
-        .from("player_stats")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
+  const loadStats = async () => {
+    const { data, error } = await supabase
+      .from("player_stats")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
 
-      // if it's a real error (not just "no row found")
-      if (error && error.code !== "PGRST116") {
-        console.error("Error loading stats:", error);
-        return;
-      }
+    if (error && error.code !== "PGRST116") {
+      console.error("Error loading stats:", error);
+      return;
+    }
 
-      if (data) {
-        // existing row – hydrate state
-        setStepsToday(data.steps_today ?? 0);
-        setTotalSteps(data.total_steps ?? 0);
-        setXp(data.xp ?? 0);
-        setLevel(data.level ?? 1);
-      } else {
-        // first time – create default row
-        const { error: insertError } = await supabase
+    const today = new Date().toISOString().split("T")[0];
+
+    if (data) {
+      const isNewDay = data.last_updated !== today;
+
+      // If new day → reset stepsToday
+      setStepsToday(isNewDay ? 0 : data.steps_today ?? 0);
+      setTotalSteps(data.total_steps ?? 0);
+      setXp(data.xp ?? 0);
+      setLevel(data.level ?? 1);
+
+      // Update last_updated + reset daily steps in Supabase
+      if (isNewDay) {
+        await supabase
           .from("player_stats")
-          .insert({
-            user_id: user.id,
+          .update({
             steps_today: 0,
-            total_steps: 0,
-            xp: 0,
-            level: 1,
-          });
-
-        if (insertError) {
-          console.error("Error creating stats row:", insertError);
-        }
+            last_updated: today,
+          })
+          .eq("user_id", user.id);
       }
+    } else {
+      // First time user row
+      await supabase.from("player_stats").insert({
+        user_id: user.id,
+        steps_today: 0,
+        total_steps: 0,
+        xp: 0,
+        level: 1,
+        last_updated: today,
+      });
+    }
 
-      setStatsLoaded(true);
-    };
+    setStatsLoaded(true);
+  };
 
-    loadStats();
-  }, [user, setTotalSteps]);
+  loadStats();
+}, [user, setTotalSteps]);
+
 
   /* -----------------------------
         HELPER TO SAVE STATS

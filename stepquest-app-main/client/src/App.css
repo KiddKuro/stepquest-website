@@ -681,3 +681,180 @@
     font-size: 1.25rem;
   }
 }
+
+
+.input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.5rem;
+  border: 1px solid #1f2937;
+  background: #020617;
+  color: #e5e7eb;
+}
+.input:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 1px #0ea5e9;
+}
+
+
+/* ==== LEADERBOARD ==== */
+
+.leaderboard-list {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 14px;
+  background: #020617;
+  border: 1px solid #111827;
+}
+
+.leaderboard-row-me {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 1px #22c55e55;
+}
+
+.leaderboard-rank {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #9ca3af;
+  width: 24px;
+}
+
+.leaderboard-main {
+  flex: 1;
+}
+
+.leaderboard-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.leaderboard-steps {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* ==== FRIENDS ==== */
+
+.friends-form {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.friends-input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid #111827;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.friends-list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.friends-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border-radius: 14px;
+  background: #020617;
+  border: 1px solid #111827;
+}
+
+.friends-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.friends-steps {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.friends-remove-btn {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+/* ==== SETTINGS ==== */
+
+.settings-form {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.settings-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.settings-input {
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid #111827;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+/* Logout button in nav */
+.nav-logout-btn {
+  border: none;
+  background: #ef4444;
+  color: #f9fafb;
+  font-size: 0.65rem;
+  padding: 4px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+
+/* actual line chart canvas */
+.insights-line-chart {
+  width: 100%;
+  height: 180px;
+  display: block;
+  margin-top: 0.75rem;
+}
+
+/* the blue line */
+.insights-line-path {
+  fill: none;
+  stroke: #0ea5e9;
+  stroke-width: 2;
+}
+
+/* the green dots on the line */
+.insights-dot {
+  fill: #22c55e;
+}
+
+/* month labels row */
+.insights-month-row {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.6rem;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}

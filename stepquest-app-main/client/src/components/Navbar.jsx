@@ -1,3 +1,4 @@
+// src/components/Navbar.jsx
 import { NavLink, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { useAuth } from "../context/AuthContext";
@@ -12,7 +13,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="pixel-navbar pixel-navbar-bottom">
+    <nav className="pixel-navbar">
       <NavLink
         to="/"
         className={({ isActive }) =>
@@ -53,7 +54,25 @@ export default function Navbar() {
         <span className="pixel-tab-label">Bag</span>
       </NavLink>
 
-      
+      <NavLink
+        to="/leaderboard"
+        className={({ isActive }) =>
+          `pixel-tab ${isActive ? "active" : ""}`
+        }
+      >
+        <span className="pixel-tab-icon">🏆</span>
+        <span className="pixel-tab-label">Rank</span>
+      </NavLink>
+
+      <NavLink
+        to="/friends"
+        className={({ isActive }) =>
+          `pixel-tab ${isActive ? "active" : ""}`
+        }
+      >
+        <span className="pixel-tab-icon">👥</span>
+        <span className="pixel-tab-label">Friends</span>
+      </NavLink>
 
       <NavLink
         to="/insights"
@@ -66,24 +85,16 @@ export default function Navbar() {
       </NavLink>
 
       <NavLink
-  to="/profile"
+  to="/settings"
   className={({ isActive }) =>
     `pixel-tab ${isActive ? "active" : ""}`
   }
 >
-  <span className="pixel-tab-icon">👤</span>
-  <span className="pixel-tab-label">Profile</span>
+  <span className="pixel-tab-icon">⚙️</span>
+  <span className="pixel-tab-label">Settings</span>
 </NavLink>
 
-
-      <button
-        type="button"
-        className="pixel-tab logout-tab"
-        onClick={handleLogout}
-      >
-        <span className="pixel-tab-icon">🚪</span>
-        <span className="pixel-tab-label">Logout</span>
-      </button>
+      
     </nav>
   );
 }

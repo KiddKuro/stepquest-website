@@ -1,98 +1,95 @@
-/* ============== BOTTOM NAVBAR WRAPPER ============== */
+/* === BOTTOM APP NAVBAR === */
 
 .pixel-navbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-
-  height: 64px;
-  background: #020617;          /* deep dark */
-  border-top: 4px solid #000;
-
+  height: 72px;
+  padding: 6px 8px;
   display: flex;
-  align-items: center;
   justify-content: space-around;
+  align-items: center;
+  gap: 4px;
 
-  padding: 0 0.75rem;
+  background: rgba(2, 6, 23, 0.96);
+  border-top: 1px solid #111827;
   z-index: 999;
 
-  font-family: "Press Start 2P", monospace;
-  image-rendering: pixelated;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
-/* (Optional) if anything still uses .pixel-logo somewhere */
-.pixel-logo {
-  display: none;
+/* Respect iPhone safe-area */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pixel-navbar {
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+    height: calc(72px + env(safe-area-inset-bottom));
+  }
 }
 
-/* ============== BOTTOM TABS ============== */
-
+/* Each tab (NavLink + logout button) */
 .pixel-tab {
   flex: 1;
+  min-width: 0;
   height: 100%;
-
   border: none;
-  background: transparent;
-  color: #9ca3af;
-
-  text-decoration: none;
-  cursor: pointer;
+  outline: none;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
 
+  text-decoration: none;
+  background: transparent;
+  color: #9ca3af;
   font-size: 0.7rem;
-  transition: color 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+
+  transition: color 0.15s ease, transform 0.15s ease, background 0.15s ease;
 }
 
+/* Icon + label */
 .pixel-tab-icon {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .pixel-tab-label {
-  letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
-/* Hover effect */
-
-.pixel-tab:hover {
-  color: #e5e7eb;
-  transform: translateY(-1px);
-}
-
-/* Active route highlight (glow like app icons) */
-
+/* Active route highlight */
 .pixel-tab.active {
-  color: #22c55e; /* neon green accent */
+  color: #facc15;
 }
 
 .pixel-tab.active .pixel-tab-icon {
-  filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.9));
+  transform: translateY(-2px);
 }
 
-/* Logout tab separation */
+/* Pressed / hover */
+.pixel-tab:hover {
+  color: #e5e7eb;
+}
 
+/* Logout tab special colour */
 .logout-tab {
-  border-left: 1px solid #1e293b;
+  color: #f97373;
 }
 
-/* ============== MOBILE RESPONSIVE ============== */
+.logout-tab:hover {
+  color: #fecaca;
+}
 
-@media (max-width: 480px) {
+/* Desktop: keep it neat, smaller height */
+@media (min-width: 768px) {
   .pixel-navbar {
-    height: 60px;
-    padding: 0 0.4rem;
-  }
-
-  .pixel-tab-label {
-    font-size: 0.55rem;
-  }
-
-  .pixel-tab-icon {
-    font-size: 1.1rem;
+    height: 64px;
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 999px 999px 0 0;
   }
 }
