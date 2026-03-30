@@ -1,12 +1,15 @@
 let lastAccel = { x: 0, y: 0, z: 0 };
 let lastStepTime = 0;
 let listenerActive = false;
+let currentOnStep = null;
 
 export function startStepTracking(onStep) {
+  currentOnStep = onStep;
+
   if (listenerActive) return;                 // prevent DOUBLE registration
   listenerActive = true;
 
-  const handler = createMotionHandler(onStep);
+  const handler = createMotionHandler();
 
   // iOS permission flow
   if (typeof DeviceMotionEvent.requestPermission === "function") {
@@ -26,7 +29,7 @@ export function startStepTracking(onStep) {
   }
 }
 
-function createMotionHandler(onStep) {
+function createMotionHandler() {
   return (event) => {
     const accel = event.accelerationIncludingGravity;
     if (!accel) return;
@@ -48,6 +51,6 @@ function createMotionHandler(onStep) {
 
     lastStepTime = now;
 
-    onStep(1);  // count one real step
+    if (currentOnStep) currentOnStep(1);  // count one real step
   };
 }

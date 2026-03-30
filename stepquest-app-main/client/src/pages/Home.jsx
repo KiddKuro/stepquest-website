@@ -11,80 +11,36 @@ import LevelUpModal from "../components/LevelUpModal";
 import ZoneUnlockModal from "../components/ZoneUnlockModal";
 import { ZONES } from "../data/zones";
 import { useEnvironment } from "../hooks/useEnvironment";
+import { getHeroProgression } from "../data/progression";
 import "../components/Modals.css";
 
-/* -----------------------------
-   PIXEL KNIGHT SPRITES
-   8×8 grid
-   "." = transparent
-   "1","2","3" = different colours
-------------------------------*/
-
-const BASE_PIXELS = [
-  "..1111..",
-  ".122221.",
-  ".122221.",
-  "..3333..",
-  "..3..3..",
-  ".3....3.",
-  ".3....3.",
-  "..3333..",
-];
-
-const HERO_SPRITES = {
-  tier1: {
-    title: "Apprentice Knight",
-    pixels: BASE_PIXELS,
-    colors: {
-      "1": "#f9fafb", // helmet edge
-      "2": "#facc15", // visor / face
-      "3": "#111827", // dark armour
-    },
-  },
-  tier2: {
-    title: "Elite Vanguard",
-    pixels: BASE_PIXELS,
-    colors: {
-      "1": "#e5e7eb",
-      "2": "#f97316", // warmer visor
-      "3": "#1d4ed8", // blue armour
-    },
-  },
-  tier3: {
-    title: "Dragon Knight",
-    pixels: BASE_PIXELS,
-    colors: {
-      "1": "#fef3c7",
-      "2": "#fbbf24", // bright gold visor
-      "3": "#7f1d1d", // crimson armour
-    },
-  },
-};
-
-// ✅ Uses BOTH level & totalSteps so the knight evolves
-const getHeroSprite = (level, totalSteps) => {
-  // late‑game / high progress
-  if (level >= 10 || totalSteps >= 10000) return HERO_SPRITES.tier3;
-  // mid‑game
-  if (level >= 5 || totalSteps >= 2000) return HERO_SPRITES.tier2;
-  // early game
-  return HERO_SPRITES.tier1;
-};
+// Logic for dynamic XP scaling
+const getXpRequired = (lvl) => 250 + (lvl * 50); // Lvl 1: 300, Lvl 2: 350, Lvl 3: 400...
 
 export default function Home() {
   const navigate = useNavigate();
   const knightRef = useRef(null);
 
-  const { activeQuest, totalSteps, setTotalSteps } = useQuest();
+  const { 
+    activeQuest,
+    totalSteps,
+    setTotalSteps,
+    stepsToday,
+    setStepsToday,
+    statsLoaded,
+    setStatsLoaded,
+    level,
+    setLevel,
+    xp,
+    setXp,
+    dailyGoal,
+    setDailyGoal
+  } = useQuest();
   const { addItem } = useInventory();
   const { unlock } = useAchievements();
   const { user } = useAuth(); // current logged‑in Supabase user
 
   // Local UI state
-  const [stepsToday, setStepsToday] = useState(0);
-  const [xp, setXp] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [dailyGoal, setDailyGoal] = useState(5000);
   const [streak, setStreak] = useState(0);
   const [questProgress, setQuestProgress] = useState(0);
   const [questCompleted, setQuestCompleted] = useState(false);
@@ -97,9 +53,6 @@ export default function Home() {
   const [recentLevelData, setRecentLevelData] = useState(null);
   const [recentRewardData, setRecentRewardData] = useState(null);
   const [unlockedZoneData, setUnlockedZoneData] = useState(null);
-
-  // track when we've loaded from Supabase so we don't overwrite with zeros
-  const [statsLoaded, setStatsLoaded] = useState(false);
 
   // 🔹 NEW: avatar from ProfilePage (localStorage)
   const [avatar, setAvatar] = useState(null);
@@ -118,24 +71,28 @@ export default function Home() {
         LOAD STATS FROM SUPABASE
   ------------------------------*/
   useEffect(() => {
-  if (!user) return;
+  if (!user || statsLoaded) return;
 
   const loadStats = async () => {
-    const { data, error } = await supabase
+    const { data: results, error } = await supabase
       .from("player_stats")
       .select("*")
       .eq("user_id", user.id)
-      .single();
+      .order("last_updated", { ascending: false })
+      .limit(1);
 
     if (error && error.code !== "PGRST116") {
       console.error("Error loading stats:", error);
       return;
     }
 
+    const data = results && results.length > 0 ? results[0] : null;
+
     const today = new Date().toISOString().split("T")[0];
 
     if (data) {
-      const isNewDay = data.last_updated !== today;
+      const dbDate = data.last_updated ? String(data.last_updated).split("T")[0] : "";
+      const isNewDay = dbDate !== today;
 
       // If new day → reset stepsToday
       setStepsToday(isNewDay ? 0 : data.steps_today ?? 0);
@@ -251,7 +208,7 @@ export default function Home() {
   };
 
   loadStats();
-}, [user, setTotalSteps]);
+}, [user, statsLoaded, setTotalSteps, setStepsToday, setStatsLoaded]);
 
 
   /* -----------------------------
@@ -263,11 +220,11 @@ export default function Home() {
     const username = user.email ? user.email.split("@")[0] : `Hero_${user.id.substring(0,4)}`;
     const today = new Date().toISOString().split("T")[0];
 
-    const { error } = await supabase.from("player_stats").upsert({
-      user_id: user.id,
+    const { error } = await supabase.from("player_stats").update({
       username,
+      last_updated: today,
       ...stats,
-    });
+    }).eq("user_id", user.id);
 
     await supabase.from("daily_steps").upsert({
       user_id: user.id,
@@ -355,6 +312,35 @@ export default function Home() {
   }, [activeQuest, questCompleted, questProgress]);
 
   /* -----------------------------
+        LEVEL UP LISTENER
+  ------------------------------*/
+  useEffect(() => {
+    const needed = getXpRequired(level);
+    if (xp >= needed) {
+      const leftoverXp = xp - needed;
+      const newLevel = level + 1;
+
+      // Update states
+      setXp(leftoverXp);
+      setLevel(newLevel);
+
+      // Trigger Modal
+      setRecentLevelData({
+        oldLevel: level,
+        newLevel: newLevel,
+        newTitle: getHeroProgression(newLevel).title
+      });
+      setShowLevelModal(true);
+    }
+  }, [xp, level, totalSteps]);
+
+  const handleStepGainRef = useRef(null);
+
+  useEffect(() => {
+    handleStepGainRef.current = handleStepGain;
+  });
+
+  /* -----------------------------
         STEP TRACKING (REAL)
   ------------------------------*/
   useEffect(() => {
@@ -363,7 +349,7 @@ export default function Home() {
 
       setStepsToday((prev) => prev + steps);
       setTotalSteps((prev) => prev + steps);
-      handleStepGain(steps);
+      if (handleStepGainRef.current) handleStepGainRef.current(steps);
     });
   }, []);
 
@@ -402,28 +388,7 @@ export default function Home() {
     }
 
     /* XP SYSTEM */
-    let gainedLevel = false;
-    let nextLevel = level;
-    setXp((prev) => {
-      const needed = 300;
-      const updated = prev + Math.round(amount * 0.1);
-      if (updated >= needed) {
-        gainedLevel = true;
-        nextLevel = level + 1;
-        return updated - needed;
-      }
-      return updated;
-    });
-
-    if (gainedLevel) {
-      setLevel(nextLevel);
-      setRecentLevelData({
-        oldLevel: level,
-        newLevel: nextLevel,
-        newTitle: getHeroSprite(nextLevel, totalSteps).title
-      });
-      setShowLevelModal(true);
-    }
+    setXp((prev) => prev + Math.round(amount * 0.1));
 
     /* QUEST SYSTEM */
     if (activeQuest && !questCompleted) {
@@ -465,7 +430,7 @@ export default function Home() {
         SIMULATE STEPS (for testing)
   ------------------------------*/
   const simulateSteps = () => {
-    const fakeSteps = 500;
+    const fakeSteps = 5000;
     setStepsToday((prev) => prev + fakeSteps);
     setTotalSteps((prev) => prev + fakeSteps);
     handleStepGain(fakeSteps);
@@ -474,7 +439,7 @@ export default function Home() {
   /* -----------------------------
         UI VALUES
   ------------------------------*/
-  const xpToNext = 300;
+  const xpToNext = getXpRequired(level);
   const xpPercent = Math.min(100, Math.round((xp / xpToNext) * 100));
 
   const questGoal = Number(activeQuest?.steps || 0);
@@ -482,8 +447,8 @@ export default function Home() {
     ? Math.min(100, Math.round((questProgress / questGoal) * 100))
     : 0;
 
-  // Pixel knight sprite depends on level + totalSteps
-  const heroSprite = getHeroSprite(level, totalSteps);
+  // Pixel knight sprite depends on level
+  const heroSprite = getHeroProgression(level);
   const pixelRows = heroSprite.pixels;
   const cols = pixelRows[0].length;
 
@@ -582,7 +547,7 @@ export default function Home() {
         <section className="knight-section">
           <div
             ref={knightRef}
-            className="hero-pixel-grid"
+            className={`hero-pixel-grid ${heroSprite.visualClass || ""}`}
             style={{
               gridTemplateColumns: `repeat(${cols}, 1fr)`,
               boxShadow: `0 0 0 4px ${heroSprite.colors["1"]}33, 0 0 16px ${heroSprite.colors["3"]}66`,
@@ -673,7 +638,7 @@ export default function Home() {
           )}
 
           <button className="btn-primary full-width" onClick={simulateSteps}>
-            Simulate +500 Steps
+            Simulate +5,000 Steps
           </button>
         </section>
       </div>

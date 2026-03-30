@@ -1,5 +1,5 @@
 // src/context/InventoryContext.jsx
-import { createContext, useContext, useState, useMemo } from "react";
+import { createContext, useContext, useState, useMemo, useEffect } from "react";
 
 const InventoryContext = createContext(null);
 
@@ -27,7 +27,20 @@ const RARITY_COLORS = {
 };
 
 export function InventoryProvider({ children }) {
-  const [inventory, setInventory] = useState([]);
+  const [inventory, setInventory] = useState(() => {
+    try {
+      const stored = window.localStorage.getItem("sq_inventory");
+      return stored ? JSON.parse(stored) : [];
+    } catch (err) {
+      console.warn("Failed to parse inventory from storage:", err);
+      return [];
+    }
+  });
+
+  // Sync inventory to localStorage whenever it changes
+  useEffect(() => {
+    window.localStorage.setItem("sq_inventory", JSON.stringify(inventory));
+  }, [inventory]);
 
   /* ADD ITEM — Handles deep copy & validation */
   const addItem = (item) => {

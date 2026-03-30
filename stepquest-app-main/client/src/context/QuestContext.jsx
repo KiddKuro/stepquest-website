@@ -9,6 +9,17 @@ export function QuestProvider({ children }) {
   // Total lifetime steps (used for map progression)
   const [totalSteps, setTotalSteps] = useState(0);
 
+  // Daily steps taken (preserved across page navigation)
+  const [stepsToday, setStepsToday] = useState(0);
+
+  // Whether player stats have been loaded from Supabase this session
+  const [statsLoaded, setStatsLoaded] = useState(false);
+
+  // Global player progress
+  const [level, setLevel] = useState(1);
+  const [xp, setXp] = useState(0);
+  const [dailyGoal, setDailyGoal] = useState(5000);
+
   // Completed quests history (for achievements later)
   const [completedQuests, setCompletedQuests] = useState([]);
 
@@ -35,6 +46,16 @@ export function QuestProvider({ children }) {
         setActiveQuest,
         totalSteps,
         setTotalSteps,
+        stepsToday,
+        setStepsToday,
+        statsLoaded,
+        setStatsLoaded,
+        level,
+        setLevel,
+        xp,
+        setXp,
+        dailyGoal,
+        setDailyGoal,
         completedQuests,
         completeQuest,
       }}
