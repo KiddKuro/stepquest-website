@@ -1,0 +1,131 @@
+/* ========================================
+   BOTTOM APP NAVBAR — Premium Redesign
+   ======================================== */
+
+.pixel-navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  padding: 6px 4px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 2px;
+
+  background: rgba(5, 5, 7, 0.98);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.7);
+  z-index: 9999; /* Boost to stay above Map and Modals */
+  pointer-events: auto !important;
+
+  font-family: var(--font-body);
+}
+
+/* Respect iPhone safe-area */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pixel-navbar {
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+    height: calc(70px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Each tab */
+.pixel-tab {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  text-decoration: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+
+  transition: color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+
+/* Icon + label */
+.pixel-tab-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: transform 0.2s var(--ease-out), filter 0.2s ease;
+}
+
+.pixel-tab-label {
+  white-space: nowrap;
+}
+
+/* Active route highlight */
+.pixel-tab.active {
+  color: var(--gold);
+}
+
+.pixel-tab.active .pixel-tab-icon {
+  transform: translateY(-2px) scale(1.1);
+  filter: drop-shadow(0 2px 6px rgba(251, 191, 36, 0.4));
+}
+
+/* Animated gold underline for active tab */
+.pixel-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--gold), #f59e0b);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+  animation: navIndicatorIn 0.3s var(--ease-out);
+}
+
+@keyframes navIndicatorIn {
+  from { width: 0; opacity: 0; }
+  to { width: 20px; opacity: 1; }
+}
+
+/* Hover */
+.pixel-tab:hover {
+  color: var(--text-secondary);
+}
+
+.pixel-tab:hover .pixel-tab-icon {
+  transform: translateY(-1px);
+}
+
+/* Logout tab */
+.logout-tab {
+  color: var(--crimson);
+}
+
+.logout-tab:hover {
+  color: #fda4af;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .pixel-navbar {
+    height: 64px;
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 20px 20px 0 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+  }
+}
